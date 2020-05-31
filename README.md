@@ -31,7 +31,7 @@ q.get()   # Will raise ttlcollections.errors.QueueEmpty because the TTL for 1 ha
 
 #### Methods
 
-This is the methods documentation for TTLStack in Sphinx format
+This is the methods documentation for TTLQueue in Sphinx format
 
 ##### `TTLQueue` - `__init__()`
 
