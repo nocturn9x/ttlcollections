@@ -36,26 +36,26 @@ This is the methods documentation for TTLQueue in Sphinx format
 ##### `TTLQueue` - `__init__()`
 
 A FIFO data structure with per-item time to live (TTL)
-       All items will have a default time to live, after that has
-       expired (on the next mutating operation a.k.a put or get)
-       expired elements will be popped out automatically.
-       It is also possible to set a different TTL for every item and to
-       define the maximum queue size.
-       __Note__: This queue is __NOT__ thread safe and must be properly locked
-       when used with multiple threads
+All items will have a default time to live, after that has
+expired (on the next mutating operation a.k.a put or get)
+expired elements will be popped out automatically.
+It is also possible to set a different TTL for every item and to
+define the maximum queue size.
+__Note__: This queue is __NOT__ thread safe and must be properly locked
+when used with multiple threads
 
 
 ```
-       :param qsize: The max size of the queue, defaults to 0 (no limit)
-       :type qsize: int, optional
-       :param ttl: The TTL for every item in the queue, defaults to 0 (no TTL)
-       :type ttl: int, optional
-       :param timer: The timer function that the queue will use to
-        keep track of elapsed time. Defaults to time.monotonic(), but can
-        be customized. Any function that yields an incremental value
-        on each subsequent call is acceptable, but its return values
-        should not be repeated during runtime to avoid nonsense results
-       :type timer: class: FunctionType, optional
+:param qsize: The max size of the queue, defaults to 0 (no limit)
+:type qsize: int, optional
+:param ttl: The TTL for every item in the queue, defaults to 0 (no TTL)
+:type ttl: int, optional
+:param timer: The timer function that the queue will use to
+keep track of elapsed time. Defaults to time.monotonic(), but can
+be customized. Any function that yields an incremental value
+on each subsequent call is acceptable, but its return values
+should not be repeated during runtime to avoid nonsense results
+:type timer: class: FunctionType, optional
 ```
 
 ##### `TTLQueue` - `put()`
@@ -63,33 +63,33 @@ A FIFO data structure with per-item time to live (TTL)
 Pops expired element out of the queue if their TTL has expired by when units of time (usually seconds)
 
 ```
-           :param when: The expiry date to check items against. Items' whose
-            insertion date, according to self.timer, is less or equal
-            than this number will be automatically deleted
-           :type when: int
+:param when: The expiry date to check items against. Items' whose
+insertion date, according to self.timer, is less or equal
+than this number will be automatically deleted
+:type when: int
 ```
 
 ##### `TTLQueue` - `get()`
 Puts an item onto the queue
 
 ```
-           :param element: The element to put in the queue
-           :type element: object
-           :param ttl: If you want to override the default ttl
-            of the class for a specific element, you can specify
-            that, defaults to 0 (use the default TTL)
-           :param ttl: int, optional
-           :raises QueueFull: If the queue is full
+:param element: The element to put in the queue
+:type element: object
+:param ttl: If you want to override the default ttl
+of the class for a specific element, you can specify
+that, defaults to 0 (use the default TTL)
+:param ttl: int, optional
+:raises QueueFull: If the queue is full
 ```
 
 ##### `TTLQueue` - `expire()`
 Pops expired element out of the queue if their TTL has expired by `when` units of time (usually seconds)
 
 ```
-           :param when: The expiry date to check items against. Items' whose
-            insertion date, according to self.timer, is less or equal
-            than this number will be automatically deleted
-           :type when: int
+:param when: The expiry date to check items against. Items' whose
+insertion date, according to self.timer, is less or equal
+than this number will be automatically deleted
+:type when: int
 
 
 ```
@@ -124,16 +124,16 @@ It is also possible to set a different TTL for every item and to define the maxi
 **Note**: This stack is __NOT__ thread safe and must be properly locked when used with multiple threads
  
 ```
-       :param size: The max size of the stack, defaults to 0 (no limit)
-       :type size: int, optional
-       :param ttl: The TTL for every item in the stack, defaults to 0 (no TTL)
-       :type ttl: int, optional
-       :param timer: The timer function that the stack will use to
-        keep track of elapsed time. Defaults to time.monotonic(), but can
-        be customized. Any function that yields an incremental value
-        on each subsequent call is acceptable, but its return values
-        should not be repeated during runtime to avoid nonsense results
-       :type timer: class: FunctionType, optional
+:param size: The max size of the stack, defaults to 0 (no limit)
+:type size: int, optional
+:param ttl: The TTL for every item in the stack, defaults to 0 (no TTL)
+:type ttl: int, optional
+:param timer: The timer function that the stack will use to
+keep track of elapsed time. Defaults to time.monotonic(), but can
+be customized. Any function that yields an incremental value
+on each subsequent call is acceptable, but its return values
+should not be repeated during runtime to avoid nonsense results
+:type timer: class: FunctionType, optional
 ```
 
 ##### `TTLStack` - `push()`
