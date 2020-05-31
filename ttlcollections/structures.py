@@ -4,6 +4,7 @@ from types import FunctionType
 import math
 from .errors import QueueEmpty, QueueFull, StackEmpty, StackFull
 
+
 class TTLQueue:
 
     """A FIFO data structure with per-item time to live (TTL)
@@ -22,8 +23,7 @@ class TTLQueue:
        :type ttl: int, optional
        :param timer: The timer function that the queue will use to
         keep track of elapsed time. Defaults to time.monotonic(), but can
-        be customized (another monotonic clock is timeit.default_timer, for
-        instance). Any function that yields an incremental value
+        be customized. Any function that yields an incremental value
         on each subsequent call is acceptable, but its return values
         should not be repeated during runtime to avoid nonsense results
        :type timer: class: FunctionType, optional
@@ -101,7 +101,7 @@ class TTLQueue:
             yield element
 
 
-class TTLStack(TTLQueue):
+class TTLStack:
     """A stack-like (LIFO) data structure with per-item time to live (TTL)
        All items will have a default time to live, after that has
        expired (on the next mutating operation a.k.a push or pop)
@@ -112,23 +112,24 @@ class TTLStack(TTLQueue):
        Note: This stack is NOT thread safe and must be properly locked
        when used with multiple threads
 
-       :param qsize: The max size of the stack, defaults to 0 (no limit)
-       :type qsize: int, optional
+       :param size: The max size of the stack, defaults to 0 (no limit)
+       :type size: int, optional
        :param ttl: The TTL for every item in the stack, defaults to 0 (no TTL)
        :type ttl: int, optional
        :param timer: The timer function that the stack will use to
         keep track of elapsed time. Defaults to time.monotonic(), but can
-        be customized (another monotonic clock is timeit.default_timer, for
-        instance). Any function that yields an incremental value
+        be customized. Any function that yields an incremental value
         on each subsequent call is acceptable, but its return values
         should not be repeated during runtime to avoid nonsense results
        :type timer: class: FunctionType, optional
     """
 
-    def __init__(self, qsize: int = 0, ttl: int = 0, timer: FunctionType = monotonic):
+    def __init__(self, size: int = 0, ttl: int = 0, timer: FunctionType = monotonic):
         """Object constructor"""
 
-        super().__init__(qsize, ttl, timer)
+        self.timer = timer
+        self.ttl = ttl
+        self.size = size
         self._stack = deque()
 
     def push(self, element, ttl: int = 0):
@@ -145,7 +146,7 @@ class TTLStack(TTLQueue):
 
         ttl = ttl if ttl else self.ttl
         self.expire(self.timer())
-        if len(self._stack) < self.qsize:
+        if len(self._stack) < self.size:
             self._stack.appendleft((self.timer() + ttl, element))
         else:
             raise StackFull("The stack is full!")
@@ -153,6 +154,8 @@ class TTLStack(TTLQueue):
     def pop(self):
         """Pops an item from the stack, raising StackEmpty if the
            stack is empty
+
+           :raises StackEmpty: If the stack is empty
         """
 
         self.expire(self.timer())
@@ -163,9 +166,9 @@ class TTLStack(TTLQueue):
     def __repr__(self):
         """Implements repr(self)"""
 
-        string = "TTLStack({list}, qsize={qsize}, ttl={ttl}, timer={timer})"
+        string = "TTLStack({list}, size={qsize}, ttl={ttl}, timer={timer})"
         values = [t[1] for t in self._stack]
-        return string.format(list=values, qsize=self.qsize, ttl=self.ttl, timer=self.timer)
+        return string.format(list=values, qsize=self.size, ttl=self.ttl, timer=self.timer)
 
     def expire(self, when: int):
         """Pops expired element out of the stack if their TTL has
@@ -187,4 +190,3 @@ class TTLStack(TTLQueue):
             if date <= when:
                 del self._stack[i]
             i += 1
-
