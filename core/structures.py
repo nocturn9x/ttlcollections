@@ -6,7 +6,7 @@ from .errors import QueueEmpty, QueueFull, StackEmpty, StackFull
 
 class TTLQueue:
 
-    """A FIFO queue with per-item time to live (TTL)
+    """A FIFO data structure with per-item time to live (TTL)
        All items will have a default time to live, after that has
        expired (on the next mutating operation a.k.a put or get)
        expired elements will be popped out automatically.
