@@ -129,7 +129,7 @@ class TTLStack:
 
         self.timer = timer
         self.ttl = ttl
-        self.size = size
+        self.size = size if size else math.inf
         self._stack = deque()
 
     def push(self, element, ttl: int = 0):
