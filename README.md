@@ -15,7 +15,6 @@ The difference between a stack and a queue is that the former follows the LIFO (
 
 These 2 collections are implemented using `collections.deque` for fast `O(1)` complexity when accessing elements trough `pop`/`get` and `push`/`put`
 
-For both queues and stacks you can pass
 
 ### Example - TTLQueue
 
