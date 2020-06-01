@@ -13,7 +13,8 @@ class TTLQueue:
 
        When a TTL expires, its associated element will be deleted, but please
        note that TTL expiration (and therefore, items deletion) is performed
-       only when doing mutating operations on the queue itself (put and get)
+       only when doing mutating operations on the queue itself and when
+       performing operations using the 'in' operator (put and get)
 
        It is also possible to set a different TTL for every item and to
        define the maximum queue size
@@ -114,6 +115,7 @@ class TTLQueue:
     def __contains__(self, item):
         """Implements item in self"""
 
+        self.expire(self.timer())
         return self._queue.__contains__(TTLitem(item, None))
 
 class TTLStack:
@@ -122,7 +124,8 @@ class TTLStack:
        All items inside the stack will be associated to a TTL (time to live).
        When a TTL expires, its associated element will be deleted, but please
        note that TTL expiration (and therefore, items deletion) is performed
-       only when doing mutating operations on the stack itself (push and pop)
+       only when doing mutating operations on the stack itself
+       and when performing operations using the 'in' operator (push and pop)
 
        It is also possible to set a different TTL for every item and to
        define the maximum stack size
@@ -220,6 +223,7 @@ class TTLStack:
     def __contains__(self, item):
         """Implements item in self"""
 
+        self.expire(self.timer())
         return self._stack.__contains__(TTLItem(item, None))
 
 
@@ -229,7 +233,8 @@ class TTLHeap(TTLQueue):
        All items inside the queue will be associated to a TTL (time to live).
        When a TTL expires, its associated element will be deleted, but please
        note that TTL expiration (and therefore, items deletion) is performed
-       only when doing mutating operations on the queue itself (put and get)
+       only when doing mutating operations on the queue itself and when
+       performing operations using the 'in' operator (put and get)
 
        It is also possible to set a different TTL for every item and to
        define the maximum queue size
@@ -272,6 +277,7 @@ class TTLHeap(TTLQueue):
     def __contains__(self, item):
         """Implements item in self"""
 
+        self.expire(self.timer())
         return self._queue.__contains__(TTLitem(item, None))
 
     def put(self, element, ttl: int = 0):
