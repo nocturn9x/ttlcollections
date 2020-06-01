@@ -53,13 +53,12 @@ class TTLQueue:
 
         i = 0
         n = len(self._queue)
-        while i < n:
-            try:
-                item = self._queue[i]
-            except IndexError:
-                break
+        while i < n:   # Not the nicest-looking way of doing it, but surely works and is efficient
+            item = self._queue[i]
             if item.date <= when:
-                del self._queue[i]
+                self._queue.remove(item)
+                n = len(self._queue)
+                i -= 1
             i += 1
 
     def put(self, element, ttl: int = 0):
@@ -155,7 +154,7 @@ class TTLStack:
         ttl = ttl if ttl else self.ttl
         self.expire(self.timer())
         if len(self._stack) < self.size:
-            self._stack.appendleft((self.timer() + ttl, element))
+            self._stack.appendleft(TTLItem(element, self.timer() + ttl))
         else:
             raise StackFull("The stack is full!")
 
@@ -169,13 +168,13 @@ class TTLStack:
         self.expire(self.timer())
         if not self._stack:
             raise StackEmpty("The stack is empty!")
-        return self._stack.popleft()[1]
+        return self._stack.popleft().obj
 
     def __repr__(self):
         """Implements repr(self)"""
 
         string = "TTLStack({list}, size={qsize}, ttl={ttl}, timer={timer})"
-        values = [t[1] for t in self._stack]
+        values = [t.obj for t in self._stack]
         return string.format(list=values, qsize=self.size, ttl=self.ttl, timer=self.timer)
 
     def expire(self, when: int):
@@ -190,13 +189,12 @@ class TTLStack:
 
         i = 0
         n = len(self._stack)
-        while i < n:   # Using a for loop would raise RuntimeError
-            try:
-                date, element = self._stack[i]
-            except IndexError:
-                break
-            if date <= when:
-                del self._stack[i]
+        while i < n:
+            item = self._stack[i]
+            if item.date <= when:
+                self._stack.remove(item)
+                n = len(self._stack)
+                i -= 1
             i += 1
 
 
@@ -284,7 +282,12 @@ class TTLHeap(TTLQueue):
            :type when: int
         """
 
-        for item in self._queue:
+        i = 0
+        n = len(self._queue)
+        while i < n:
+            item = self._queue[i]
             if item.date <= when:
                 self._queue.remove(item)
-
+                n = len(self._queue)
+                i -= 1
+            i += 1
