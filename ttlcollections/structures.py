@@ -38,6 +38,10 @@ class TTLQueue:
 
         self.qsize = qsize if qsize else math.inf  # Infinite size
         self.ttl = ttl
+        if self.ttl < 0:
+            raise ValueError("ttl can't be negative!")
+        if self.qsize < 0:
+            raise ValueError("qsize can't be negative!")
         self.timer = timer
         self._queue = deque()
 
@@ -74,9 +78,13 @@ class TTLQueue:
         """
 
         ttl = ttl if ttl else self.ttl
+        if not ttl:
+            ttl = math.inf
+        else:
+            ttl = ttl + self.timer()
         self.expire(self.timer())
         if len(self._queue) < self.qsize:
-            self._queue.append(TTLItem(element, ttl + self.timer()))
+            self._queue.append(TTLItem(element, ttl))
         else:
             raise QueueFull("The queue is full!")
 
@@ -137,6 +145,10 @@ class TTLStack:
         self.timer = timer
         self.ttl = ttl
         self.size = size if size else math.inf
+        if self.ttl < 0:
+            raise ValueError("ttl can't be negative!")
+        if self.size < 0:
+            raise ValueError("size can't be negative!")
         self._stack = deque()
 
     def push(self, element, ttl: int = 0):
@@ -153,8 +165,12 @@ class TTLStack:
 
         ttl = ttl if ttl else self.ttl
         self.expire(self.timer())
+        if not ttl:
+            ttl = math.inf
+        else:
+            ttl = ttl + self.timer()
         if len(self._stack) < self.size:
-            self._stack.appendleft(TTLItem(element, self.timer() + ttl))
+            self._stack.appendleft(TTLItem(element, ttl))
         else:
             raise StackFull("The stack is full!")
 
@@ -255,9 +271,13 @@ class TTLHeap(TTLQueue):
         """
 
         ttl = ttl if ttl else self.ttl
+        if not ttl:
+            ttl = math.inf
+        else:
+            ttl = ttl + self.timer()
         self.expire(self.timer())
         if len(self._queue) < self.qsize:
-            heappush(self._queue, TTLItem(element, self.timer() + ttl))
+            heappush(self._queue, TTLItem(element, ttl))
         else:
             raise QueueFull("The queue is full!")
 
