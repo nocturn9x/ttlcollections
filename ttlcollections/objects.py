@@ -2,7 +2,7 @@
 
 class TTLItem(object):
 
-    """An abstraction layer over a queue item. This class is meant
+    """An abstraction layer over a TTLed item. This class is meant
        to be used internally and should not be instantiated directly
 
        :param obj: The object to be wrapped
@@ -21,3 +21,8 @@ class TTLItem(object):
         if isinstance(other, TTLItem):
             other = other.obj
         return self.obj.__lt__(other)
+
+    def __eq__(self, other):
+        if isinstance(other, TTLItem):
+            other = other.obj
+        return self.obj.__eq__(other)
