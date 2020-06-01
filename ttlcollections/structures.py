@@ -111,7 +111,10 @@ class TTLQueue:
         for element in self._queue:
             yield element.obj
 
+    def __contains__(self, item):
+        """Implements item in self"""
 
+        return self._queue.__contains__(item)
 
 class TTLStack:
     """A stack (LIFO) with per-item time to live (TTL)
@@ -214,6 +217,12 @@ class TTLStack:
             i += 1
 
 
+    def __contains__(self, item):
+        """Implements item in self"""
+
+        return self._stack.__contains__(item)
+
+
 class TTLHeap(TTLQueue):
     """A heap queue with per-item time to live (TTL)
 
@@ -257,6 +266,13 @@ class TTLHeap(TTLQueue):
         string = "TTLHeap({list}, qsize={qsize}, ttl={ttl}, timer={timer})"
         values = [t.obj for t in self._queue]
         return string.format(list=values, qsize=self.qsize, ttl=self.ttl, timer=self.timer)
+
+
+
+    def __contains__(self, item):
+        """Implements item in self"""
+
+        return self._queue.__contains__(item)
 
     def put(self, element, ttl: int = 0):
         """Puts an item onto the queue
