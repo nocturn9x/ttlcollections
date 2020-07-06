@@ -113,7 +113,18 @@ class TTLQueue:
         """Implements item in self"""
 
         self.expire(self.timer())
-        return self._queue.__contains__(TTLitem(item, None))
+        return self._queue.__contains__(TTLItem(item, None))
+
+    def __bool__(self):
+        """Implement bool(self)"""
+
+        return bool(self._queue)
+
+    def __eq__(self, other: object):
+        """Implements self == other"""
+
+        queue = [item.obj for item in self._queue]
+        return queue == other
 
 
 class TTLStack:
@@ -220,6 +231,17 @@ class TTLStack:
         self.expire(self.timer())
         return self._stack.__contains__(TTLItem(item, None))
 
+    def __bool__(self):
+        """Implement bool(self)"""
+
+        return bool(self._stack)
+
+    def __eq__(self, other: object):
+        """Implements self == other"""
+
+        stack = [item.obj for item in self._stack]
+        return stack == other
+
 
 class TTLHeap(TTLQueue):
     """A heap queue with per-item time to live (TTL)
@@ -269,7 +291,7 @@ class TTLHeap(TTLQueue):
     def __contains__(self, item):
         """Implements item in self"""
 
-       super().__contains__(item)
+        super().__contains__(item)
 
     def put(self, element, ttl: int = 0):
         """Puts an item onto the queue
@@ -313,3 +335,13 @@ class TTLHeap(TTLQueue):
         """
 
         super().expire(when)
+
+    def __bool__(self):
+        """Implement bool(self)"""
+
+        return super().__bool__()
+
+    def __eq__(self, other: object):
+        """Implements self == other"""
+
+        return super().__eq__(other)
