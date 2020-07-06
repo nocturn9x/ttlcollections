@@ -1,7 +1,7 @@
 from collections import deque
 from time import monotonic
 from types import FunctionType
-import math
+from math import inf
 from .errors import QueueEmpty, QueueFull, StackEmpty, StackFull
 from heapq import heappush, heappop
 from .objects import TTLItem
@@ -13,8 +13,8 @@ class TTLQueue:
 
        When a TTL expires, its associated element will be deleted, but please
        note that TTL expiration (and therefore, items deletion) is performed
-       only when doing mutating operations on the queue itself and when
-       performing operations using the 'in' operator (put and get)
+       only when doing mutating operations (e.g. put and get)
+       on the queue itself and when performing operations using the 'in' operator
 
        It is also possible to set a different TTL for every item and to
        define the maximum queue size
@@ -37,7 +37,7 @@ class TTLQueue:
     def __init__(self, qsize: int = 0, ttl: int = 0, timer: FunctionType = monotonic):
         """Object constructor"""
 
-        self.qsize = qsize if qsize else math.inf  # Infinite size
+        self.qsize = qsize if qsize else inf  # Infinite size
         self.ttl = ttl
         if self.ttl < 0:
             raise ValueError("ttl can't be negative!")
@@ -78,12 +78,9 @@ class TTLQueue:
            :raises QueueFull: If the queue is full
         """
 
-        ttl = ttl if ttl else self.ttl
-        if not ttl:
-            ttl = math.inf
-        else:
-            ttl = ttl + self.timer()
         self.expire(self.timer())
+        ttl = ttl if ttl else self.ttl
+        ttl += self.timer()
         if len(self._queue) < self.qsize:
             self._queue.append(TTLItem(element, ttl))
         else:
@@ -109,8 +106,8 @@ class TTLQueue:
     def __iter__(self):
         """Implements iter(self)"""
 
-        for element in self._queue:
-            yield element.obj
+        for item in self._queue:
+            yield item.obj
 
     def __contains__(self, item):
         """Implements item in self"""
@@ -118,14 +115,15 @@ class TTLQueue:
         self.expire(self.timer())
         return self._queue.__contains__(TTLitem(item, None))
 
+
 class TTLStack:
     """A stack (LIFO) with per-item time to live (TTL)
 
        All items inside the stack will be associated to a TTL (time to live).
        When a TTL expires, its associated element will be deleted, but please
        note that TTL expiration (and therefore, items deletion) is performed
-       only when doing mutating operations on the stack itself
-       and when performing operations using the 'in' operator (push and pop)
+       only when doing mutating operations on the stack itself (e.g. push/pop)
+       and when performing operations using the 'in' operator
 
        It is also possible to set a different TTL for every item and to
        define the maximum stack size
@@ -150,7 +148,7 @@ class TTLStack:
 
         self.timer = timer
         self.ttl = ttl
-        self.size = size if size else math.inf
+        self.size = size if size else inf
         if self.ttl < 0:
             raise ValueError("ttl can't be negative!")
         if self.size < 0:
@@ -169,12 +167,9 @@ class TTLStack:
            :raises StackFull: If the stack is full
         """
 
-        ttl = ttl if ttl else self.ttl
         self.expire(self.timer())
-        if not ttl:
-            ttl = math.inf
-        else:
-            ttl = ttl + self.timer()
+        ttl = ttl if ttl else self.ttl
+        ttl += self.timer()
         if len(self._stack) < self.size:
             self._stack.appendleft(TTLItem(element, ttl))
         else:
@@ -219,7 +214,6 @@ class TTLStack:
                 i -= 1
             i += 1
 
-
     def __contains__(self, item):
         """Implements item in self"""
 
@@ -233,8 +227,8 @@ class TTLHeap(TTLQueue):
        All items inside the queue will be associated to a TTL (time to live).
        When a TTL expires, its associated element will be deleted, but please
        note that TTL expiration (and therefore, items deletion) is performed
-       only when doing mutating operations on the queue itself and when
-       performing operations using the 'in' operator (put and get)
+       only when doing mutating operations (put/get) on the queue itself and
+       when performing operations using the 'in' operator.
 
        It is also possible to set a different TTL for every item and to
        define the maximum queue size
@@ -272,13 +266,10 @@ class TTLHeap(TTLQueue):
         values = [t.obj for t in self._queue]
         return string.format(list=values, qsize=self.qsize, ttl=self.ttl, timer=self.timer)
 
-
-
     def __contains__(self, item):
         """Implements item in self"""
 
-        self.expire(self.timer())
-        return self._queue.__contains__(TTLitem(item, None))
+       super().__contains__(item)
 
     def put(self, element, ttl: int = 0):
         """Puts an item onto the queue
@@ -292,12 +283,9 @@ class TTLHeap(TTLQueue):
            :raises QueueFull: If the queue is full
         """
 
-        ttl = ttl if ttl else self.ttl
-        if not ttl:
-            ttl = math.inf
-        else:
-            ttl = ttl + self.timer()
         self.expire(self.timer())
+        ttl = ttl if ttl else self.ttl
+        ttl += self.timer()
         if len(self._queue) < self.qsize:
             heappush(self._queue, TTLItem(element, ttl))
         else:
@@ -324,12 +312,4 @@ class TTLHeap(TTLQueue):
            :type when: int
         """
 
-        i = 0
-        n = len(self._queue)
-        while i < n:
-            item = self._queue[i]
-            if item.date <= when:
-                self._queue.remove(item)
-                n = len(self._queue)
-                i -= 1
-            i += 1
+        super().expire(when)
